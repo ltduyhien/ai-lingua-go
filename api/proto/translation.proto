@@ -1,0 +1,31 @@
+// Declares that this file uses Protocol Buffers syntax version 3.
+// proto3 is the current recommended version; all fields are optional by default.
+syntax = "proto3";
+
+// Package name used to avoid naming conflicts when importing this proto.
+package translation.v1;
+
+// Tells protoc where to emit Go code and what import path the generated code will use.
+option go_package = "github.com/ltduyhien/ai-lingua-go/api/gen/translation/v1;translationv1";
+
+// TranslateRequest is the message sent by a client when requesting a translation.
+message TranslateRequest {
+  // The text to translate.
+  string text = 1;
+  // Source language code (e.g. "en", "es").
+  string source_lang = 2;
+  // Target language code.
+  string target_lang = 3;
+}
+
+// TranslateResponse is the message returned by the server with the translation result.
+message TranslateResponse {
+  // The translated text.
+  string translated_text = 1;
+}
+
+// TranslationService defines the gRPC service for text translation.
+service TranslationService {
+  // Translate takes a request with text and language codes, returns the translated text.
+  rpc Translate(TranslateRequest) returns (TranslateResponse);
+}
