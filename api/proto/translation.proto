@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package translation.v1;
+
+option go_package = "github.com/ltduyhien/ai-lingua-go/api/gen/translation/v1;translationv1";
+
+message TranslateRequest {
+  string text = 1;
+  string source_lang = 2;
+  string target_lang = 3;
+}
+
+message TranslateResponse {
+  string translated_text = 1;
+}
+
+service TranslationService {
+  rpc Translate(TranslateRequest) returns (TranslateResponse);
+}
