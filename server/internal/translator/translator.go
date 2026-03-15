@@ -66,6 +66,6 @@ func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang
 // We use a separate function so the main Translate logic stays readable and we can test or change the prompt shape in one place.
 func buildTranslatePrompt(text, sourceLang, targetLang string) string {
 	return "Translate the following text from " + sourceLang + " to " + targetLang + ".\n" +
-		"Rules: Output ONLY the translation in the target language. Translate every word—do not leave any source-language words untranslated (use the target language equivalent even for technical or rare terms). Do not include the original text, any part of it, or any explanation. Do not mix source and target language in the output.\n\n" +
+		"Rules: Output ONLY the translation in the target language. Translate every word—do not leave any source-language words untranslated (use the target language equivalent even for technical or rare terms). Do not include the original text, any part of it, or any explanation. Do not mix source and target language in the output. Preserve the same paragraph structure and line breaks as the source: use newlines in the same places so that lists, verses, or multi-paragraph text keep their layout.\n\n" +
 		"Text to translate:\n" + text
 }

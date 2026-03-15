@@ -160,7 +160,7 @@ function App() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <ArrowRight className="size-5 text-[hsl(var(--muted-foreground))] shrink-0" aria-hidden />
+                  <ArrowRight className="app-lang-arrow" aria-hidden />
                   <Select
                     value={targetLang}
                     onValueChange={setTargetLang}
