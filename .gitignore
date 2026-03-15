@@ -6,7 +6,8 @@
 *.dylib
 bin/
 dist/
-server
+/server
+server.bin
 
 # Test binary
 *.test
@@ -22,6 +23,7 @@ go.work
 # IDE
 .idea/
 .vscode/
+.cursor/
 *.swp
 *.swo
 
