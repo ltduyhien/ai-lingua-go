@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,6 +12,7 @@ import (
 	"github.com/ltduyhien/ai-lingua-go/config"
 	"github.com/ltduyhien/ai-lingua-go/internal/cache"
 	grpchandler "github.com/ltduyhien/ai-lingua-go/internal/grpc"
+	"github.com/ltduyhien/ai-lingua-go/internal/rest"
 	"github.com/ltduyhien/ai-lingua-go/internal/translator"
 	translationv1 "github.com/ltduyhien/ai-lingua-go/api/gen/translation/v1"
 
@@ -36,22 +38,36 @@ func main() {
 		}
 		cacheSvc = c
 	}
-	srv := grpc.NewServer()
-	translationv1.RegisterTranslationServiceServer(srv, grpchandler.NewServer(tr, cacheSvc))
-	reflection.Register(srv)
+	grpcSrv := grpc.NewServer()
+	translationServer := grpchandler.NewServer(tr, cacheSvc)
+	translationv1.RegisterTranslationServiceServer(grpcSrv, translationServer)
+	reflection.Register(grpcSrv)
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
 		log.Fatalf("listen: %v", err)
 	}
 	go func() {
-		if err := srv.Serve(lis); err != nil {
-			log.Fatalf("serve: %v", err)
+		if err := grpcSrv.Serve(lis); err != nil {
+			log.Fatalf("serve gRPC: %v", err)
 		}
 	}()
-	log.Printf("server listening on :%s", cfg.GRPCPort)
+	log.Printf("gRPC listening on :%s", cfg.GRPCPort)
+
+	httpHandler := rest.NewHandler(translationServer)
+	httpLis, err := net.Listen("tcp", ":"+cfg.HTTPPort)
+	if err != nil {
+		log.Fatalf("listen HTTP: %v", err)
+	}
+	go func() {
+		if err := http.Serve(httpLis, httpHandler); err != nil {
+			log.Fatalf("serve HTTP: %v", err)
+		}
+	}()
+	log.Printf("HTTP (REST) listening on :%s", cfg.HTTPPort)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	srv.GracefulStop()
+	grpcSrv.GracefulStop()
+	_ = httpLis.Close()
 	log.Println("server stopped")
 }

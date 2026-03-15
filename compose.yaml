@@ -1,15 +1,20 @@
-# Full stack: gRPC translation server + Ollama (LLM) + Redis (cache).
+# Full stack: gRPC translation server + Ollama (LLM) + Redis (cache) + frontend.
 # Each component lives in its own folder and container:
-#   server/  - Go gRPC app (build from server/Dockerfile)
-#   ollama/   - LLM runtime (build from ollama/Dockerfile)
-#   redis/    - Cache (build from redis/Dockerfile)
+#   server/   - Go gRPC + REST app (server/Dockerfile)
+#   ollama/   - LLM runtime (ollama/Dockerfile)
+#   redis/    - Cache (redis/Dockerfile)
+#   frontend/ - React app served by nginx (frontend/Dockerfile)
 #
 # Usage:
 #   docker compose up -d
 #   # First time: pull the model so Ollama can serve requests:
 #   docker compose exec ollama ollama pull qwen2.5:7b
-#   # Call the service (from host):
-#   grpcurl -plaintext -d '{"text":"Hello","source_lang":"en","target_lang":"es"}' localhost:50051 translation.v1.TranslationService/Translate
+#   Open the app: http://localhost:3002  (REST API: http://localhost:8081)
+#   gRPC: grpcurl -plaintext -d '{"text":"Hello","source_lang":"en","target_lang":"es"}' localhost:50051 translation.v1.TranslationService/Translate
+#
+# Memory: qwen2.5:7b needs ~4–5 GB RAM. If you see "model requires more system memory":
+#   - Give Docker more memory (Docker Desktop → Settings → Resources), or
+#   - Use a smaller model: OLLAMA_MODEL=tinyllama docker compose up -d, then: docker compose exec ollama ollama pull tinyllama
 #
 # Optional: use GPU for Ollama (uncomment deploy.resources.reservations.devices for the ollama service).
 
@@ -40,21 +45,23 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
-    # Uncomment for NVIDIA GPU:
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+    # Uncomment on hosts with NVIDIA GPU + nvidia-container-toolkit; leave commented on servers without GPU to avoid startup errors.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   server:
     build: ./server
     ports:
       - "50051:50051"
+      - "8081:8080"
     environment:
       GRPC_PORT: "50051"
+      HTTP_PORT: "8080"
       REDIS_ADDR: "redis:6379"
       REDIS_TTL_SECONDS: "300"
       OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2.5:7b}"
@@ -64,6 +71,17 @@ services:
         condition: service_healthy
       ollama:
         condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: "${VITE_API_URL:-http://localhost:8081}"
+    ports:
+      - "3002:80"
+    depends_on:
+      - server
     restart: unless-stopped
 
 volumes:
