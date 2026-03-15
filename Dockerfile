@@ -28,9 +28,9 @@ RUN go mod download
 # Copy the rest of the source (proto files, Makefile, config, cmd, internal, etc.).
 COPY . .
 
-# Generate Go code from .proto files; creates api/gen/ with .pb.go and _grpc.pb.go.
-# Then build the server binary into /app/server; CGO_ENABLED=0 produces a static binary for the final image.
-RUN make proto && CGO_ENABLED=0 go build -o /app/server ./cmd/server
+# Generate Go code from .proto files; then run all tests so deploy fails if tests fail.
+# Finally build the server binary into /app/server; CGO_ENABLED=0 produces a static binary for the final image.
+RUN make proto && go test ./... && CGO_ENABLED=0 go build -o /app/server ./cmd/server
 
 # Stage 2: minimal runtime image; we only need the binary and no build tools.
 # scratch is an empty image; we add only the binary and (optional) CA certs if we need HTTPS.

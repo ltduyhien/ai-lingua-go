@@ -5,7 +5,7 @@ package translator
 import (
 	// context is used to pass cancellation and timeouts into the LLM call so we can abort if needed.
 	"context"
-	// strings is used to trim whitespace from the model output so we don't return stray newlines or spaces.
+	"errors"
 	"strings"
 	// llms is the LangChainGo core type for "language model"; we use it for GenerateFromSinglePrompt.
 	"github.com/tmc/langchaingo/llms"
@@ -31,6 +31,10 @@ func New(ctx context.Context, model, baseURL string) (*Translator, error) {
 		// If Ollama is unreachable or options are invalid, we return the error so the server can fail fast at startup.
 		return nil, err
 	}
+	// Some ollama.New implementations can return (nil, nil); guard so we never store a nil llm and panic in Translate.
+	if llm == nil {
+		return nil, errors.New("ollama client is nil")
+	}
 	// Wrap the concrete *ollama.LLM in our struct; we use llms.Model so we could swap to another LLM later if needed.
 	return &Translator{llm: llm}, nil
 }
@@ -38,6 +42,10 @@ func New(ctx context.Context, model, baseURL string) (*Translator, error) {
 // Translate sends the text and language pair to the LLM and returns the translated text.
 // sourceLang and targetLang are short codes (e.g. "en", "es"); they are embedded in the prompt so the model knows the direction.
 func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang string) (string, error) {
+	// Guard against nil llm so we return an error instead of panicking (e.g. if New stored nil).
+	if t == nil || t.llm == nil {
+		return "", errors.New("translator not initialized")
+	}
 	// Build a single prompt that instructs the model to translate; we keep it simple so the model returns only the translation.
 	prompt := buildTranslatePrompt(text, sourceLang, targetLang)
 	// GenerateFromSinglePrompt calls the LLM with one string; it handles encoding and the HTTP request to Ollama.
