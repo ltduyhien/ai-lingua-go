@@ -1,21 +1,12 @@
-# Ignore generated code; Docker runs make proto to create it so we don't rely on local state.
 api/gen/
-
-# Git metadata not needed in the image.
 .git
 .gitignore
-
-# Avoid copying build output or local binaries into the build context.
 server
 bin/
 dist/
-
-# IDE and OS files.
 .idea
 .vscode
 .DS_Store
-
-# Env files; config should come from runtime env or secrets, not baked into the image.
 .env
 .env.local
 *.local
