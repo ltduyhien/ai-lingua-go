@@ -1,6 +1,6 @@
 # Stage 1: build the binary (proto generation + Go build).
 # We use the official Go image so we have the Go toolchain; we add protoc and Make for proto generation.
-FROM golang:1.22-bookworm AS builder
+FROM golang:1.23-bookworm AS builder
 
 # Install protoc (protocol buffer compiler) and make from Debian packages.
 # apt-get update refreshes package lists; -y avoids interactive prompts.
@@ -10,10 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	make \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Install the Go plugins that protoc uses to generate Go code.
-# They are installed into $GOPATH/bin (or $HOME/go/bin) so protoc can find them.
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest \
-	&& go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+# Install the Go plugins that protoc uses (pinned for reproducible builds).
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2 \
+	&& go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
 
 # Set the working directory inside the container to /app so all following paths are relative to it.
 WORKDIR /app
@@ -37,8 +36,8 @@ RUN make proto && go test ./... && CGO_ENABLED=0 go build -o /app/server ./cmd/s
 FROM debian:bookworm-slim
 
 # Create a non-root user so the process does not run as root.
-# -D means no password, no home dir; the name of the user is "app".
-RUN useradd -D -s /sbin/nologin app
+# -M = no home dir, -s = shell (nologin so the account cannot log in).
+RUN useradd -M -s /sbin/nologin app
 
 # Switch to the app user so the binary runs with reduced privileges.
 USER app

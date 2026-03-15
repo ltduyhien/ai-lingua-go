@@ -49,8 +49,11 @@ func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang
 	// Build a single prompt that instructs the model to translate; we keep it simple so the model returns only the translation.
 	prompt := buildTranslatePrompt(text, sourceLang, targetLang)
 	// GenerateFromSinglePrompt calls the LLM with one string; it handles encoding and the HTTP request to Ollama.
-	// We pass ctx so the call can be cancelled or timed out; we use the default temperature (no extra option).
-	resp, err := llms.GenerateFromSinglePrompt(ctx, t.llm, prompt)
+	// WithMaxTokens limits output length so the model stops sooner; WithTemperature reduces sampling for faster, more deterministic output.
+	resp, err := llms.GenerateFromSinglePrompt(ctx, t.llm, prompt,
+		llms.WithMaxTokens(1024),
+		llms.WithTemperature(0.2),
+	)
 	if err != nil {
 		// Network errors, timeouts, or Ollama errors are returned to the caller (the gRPC handler) to map to gRPC status.
 		return "", err
@@ -62,6 +65,7 @@ func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang
 // buildTranslatePrompt returns a prompt string that tells the model to translate from sourceLang to targetLang.
 // We use a separate function so the main Translate logic stays readable and we can test or change the prompt shape in one place.
 func buildTranslatePrompt(text, sourceLang, targetLang string) string {
-	// Simple instruction plus the text; the model is expected to reply with only the translation.
-	return "Translate the following text from " + sourceLang + " to " + targetLang + ". Reply with only the translation.\n\n" + text
+	return "Translate the following text from " + sourceLang + " to " + targetLang + ".\n" +
+		"Rules: Output ONLY the translation in the target language. Translate every word—do not leave any source-language words untranslated (use the target language equivalent even for technical or rare terms). Do not include the original text, any part of it, or any explanation. Do not mix source and target language in the output.\n\n" +
+		"Text to translate:\n" + text
 }
