@@ -34,6 +34,10 @@ type Config struct {
 	// OllamaBaseURL is the Ollama API base URL (e.g. "http://localhost:11434").
 	// Env: OLLAMA_BASE_URL
 	OllamaBaseURL string
+
+	// HTTPPort is the port for the REST API (e.g. "8080") used by the frontend.
+	// Env: HTTP_PORT
+	HTTPPort string
 }
 
 // Load reads configuration values from environment variables and returns a Config instance.
@@ -86,6 +90,13 @@ func Load() (*Config, error) {
 	}
 	// Store the (possibly defaulted) Ollama base URL into the Config struct.
 	cfg.OllamaBaseURL = ollamaBaseURL
+
+	// Read the HTTP_PORT environment variable for the REST API server port.
+	httpPort := os.Getenv("HTTP_PORT")
+	if httpPort == "" {
+		httpPort = "8080"
+	}
+	cfg.HTTPPort = httpPort
 
 	// Call the Validate method to ensure all required fields are present and consistent.
 	if err := cfg.Validate(); err != nil {
