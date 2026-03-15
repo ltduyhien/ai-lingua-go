@@ -248,6 +248,7 @@
 
 .app-translation-text {
   margin: 0;
+  white-space: pre-line;
 }
 
 /* Error block: chat-agent style, compact with retry */
@@ -416,7 +417,7 @@ body {
 
 /* Headings and caption (semantic hierarchy) */
 .app-heading {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.025em;
@@ -537,6 +538,16 @@ body {
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
+}
+
+/* Arrow between language dropdowns: fixed size so it doesn't shrink (size-4 = 16px) */
+.app-lang-arrow {
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
+  flex-shrink: 0;
+  color: hsl(var(--muted-foreground));
 }
 .app-form-vertical .app-lang-row > div {
   flex: 1 1 0%;
