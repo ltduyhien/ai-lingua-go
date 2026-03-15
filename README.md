@@ -4,10 +4,12 @@ Project layout
 
 ```
 ai-lingua-go/
-├── compose.yaml       # Runs server + Ollama + Redis (each in its own container)
-├── server/            # Go gRPC app (Dockerfile, cmd, internal, api, config)
-├── ollama/            # Ollama LLM runtime (Dockerfile → ollama/ollama)
-└── redis/             # Redis cache (Dockerfile → redis:7-alpine)
+├── compose.yaml       # Full stack: server + Ollama + Redis + frontend
+├── compose.dev.yaml   # Dev overrides (frontend hot-reload)
+├── server/            # Go backend (gRPC, REST, Dockerfile, cmd, internal, api)
+├── frontend/          # React + Vite app (src, public)
+├── ollama/            # Ollama LLM (Dockerfile)
+└── redis/             # Redis cache (Dockerfile)
 ```
 
 Run the full stack:
