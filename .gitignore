@@ -13,6 +13,9 @@ server
 coverage.txt
 coverage.html
 
+# Generated proto code
+api/gen/
+
 # Go workspace
 go.work
 
