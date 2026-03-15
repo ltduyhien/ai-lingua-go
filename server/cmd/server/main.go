@@ -1,4 +1,3 @@
-// Package main is the entry point for the ai-lingua-go gRPC server.
 package main
 
 import (
