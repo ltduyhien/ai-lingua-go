@@ -1,4 +1,3 @@
-// Package rest provides an HTTP REST API for the translation service so browser clients can call it.
 package rest
 
 import (
@@ -11,34 +10,28 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// TranslateRequest is the JSON body for POST /api/translate.
 type TranslateRequest struct {
 	Text       string `json:"text"`
 	SourceLang string `json:"source_lang"`
 	TargetLang string `json:"target_lang"`
 }
 
-// TranslateResponse is the JSON response from POST /api/translate.
 type TranslateResponse struct {
 	TranslatedText string `json:"translated_text"`
 }
 
-// ErrorResponse is returned on validation or server errors.
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-// Handler wraps the gRPC translation server and exposes POST /api/translate with CORS for the frontend.
 type Handler struct {
 	grpc *grpchandler.Server
 }
 
-// NewHandler returns an HTTP handler that delegates to the gRPC server's Translate method.
 func NewHandler(grpc *grpchandler.Server) *Handler {
 	return &Handler{grpc: grpc}
 }
 
-// ServeHTTP handles OPTIONS (CORS preflight) and POST /api/translate.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	setCORS(w)
 	if r.Method == http.MethodOptions {

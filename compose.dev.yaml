@@ -1,11 +1,3 @@
-# Override for local development: frontend runs Vite dev server with source mounted,
-# so file changes are detected and the app hot-reloads.
-#
-# Usage:
-#   docker compose -f compose.yaml -f compose.dev.yaml up -d
-#   # Or: docker compose --profile dev up -d  (if you add profiles to compose.yaml)
-#   Open http://localhost:3002  (Vite dev server; changes auto-reload)
-
 services:
   frontend:
     build:
@@ -17,7 +9,6 @@ services:
       - "3002:5173"
     volumes:
       - ./frontend:/app
-      # Prevent overwriting node_modules from host
       - /app/node_modules
     environment:
       VITE_API_URL: "${VITE_API_URL:-http://localhost:8081}"

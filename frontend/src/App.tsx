@@ -116,7 +116,6 @@ function App() {
     )
   }
 
-  /* Pairs: each user message + following assistant message = one translation block */
   const pairs = (() => {
     const out: { id: string; original: string; assistant: Message }[] = []
     for (let i = 0; i < messages.length - 1; i++) {
