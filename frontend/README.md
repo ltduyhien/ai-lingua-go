@@ -10,13 +10,17 @@ From the repo root:
 docker compose up -d
 ```
 
-Then open **http://localhost:3000**. The frontend container serves the built app; the browser calls the REST API at `http://localhost:8080` (default). To override the API URL at build time: `VITE_API_URL=http://your-host:8080 docker compose build frontend`.
+Then open http://localhost:3000. The frontend container serves the built app; the browser calls the REST API at `http://localhost:8080` (default). To override the API URL at build time:
+
+```bash
+VITE_API_URL=http://your-host:8080 docker compose build frontend
+```
 
 ## Run locally (dev)
 
-1. Start the backend (REST API on port 8080). From repo root:
-   - **Docker:** `docker compose up -d` (server exposes HTTP on 8080)
-   - **Local:** from `server/`: `HTTP_PORT=8080 OLLAMA_MODEL=qwen2.5:7b go run ./cmd/server`
+1. Start the backend (REST API on port 8080). From repo root, either:
+   - Docker: `docker compose up -d` (server exposes HTTP on 8080)
+   - Local (from `server/`): `HTTP_PORT=8080 OLLAMA_MODEL=qwen2.5:7b go run ./cmd/server`
 
 2. From this directory:
    ```bash
