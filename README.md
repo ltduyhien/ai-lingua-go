@@ -1,5 +1,17 @@
 A lightweight Go backend for AI-powered text translation using LangChainGo, Ollama, gRPC, and Redis.
 
+Project layout (container-friendly)
+
+```
+ai-lingua-go/
+├── compose.yaml       # Runs server + Ollama + Redis (each in its own container)
+├── server/            # Go gRPC app (Dockerfile, cmd, internal, api, config)
+├── ollama/            # Ollama LLM runtime (Dockerfile → ollama/ollama)
+└── redis/             # Redis cache (Dockerfile → redis:7-alpine)
+```
+
+Run the full stack: `docker compose up -d`, then `docker compose exec ollama ollama pull qwen2.5:7b`. Call the API on port 50051 (see compose.yaml comments).
+
 Technology Choices
 
 1. Go. Backend language. Fast, concurrent, single binary. Good fit for servers.
