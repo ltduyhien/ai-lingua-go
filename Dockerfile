@@ -16,7 +16,7 @@ RUN go mod download
 
 COPY . .
 
-RUN make proto && CGO_ENABLED=0 go build -o /app/server ./cmd/server
+RUN make proto && go test ./... && CGO_ENABLED=0 go build -o /app/server ./cmd/server
 
 FROM debian:bookworm-slim
 

@@ -4,20 +4,28 @@ import (
 	"context"
 
 	translationv1 "github.com/ltduyhien/ai-lingua-go/api/gen/translation/v1"
-	"github.com/ltduyhien/ai-lingua-go/internal/cache"
-	"github.com/ltduyhien/ai-lingua-go/internal/translator"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type Server struct {
-	translationv1.UnimplementedTranslationServiceServer
-	translator *translator.Translator
-	cache      *cache.Cache
+type Translator interface {
+	Translate(ctx context.Context, text, sourceLang, targetLang string) (string, error)
 }
 
-func NewServer(tr *translator.Translator, c *cache.Cache) *Server {
+type Cache interface {
+	Key(text, sourceLang, targetLang string) string
+	Get(ctx context.Context, key string) (string, bool, error)
+	Set(ctx context.Context, key, value string) error
+}
+
+type Server struct {
+	translationv1.UnimplementedTranslationServiceServer
+	translator Translator
+	cache      Cache
+}
+
+func NewServer(tr Translator, c Cache) *Server {
 	return &Server{translator: tr, cache: c}
 }
 
