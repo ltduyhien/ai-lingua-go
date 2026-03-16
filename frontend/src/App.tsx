@@ -199,7 +199,7 @@ function App() {
                   <textarea
                     value={customPrompt}
                     onChange={(e) => setCustomPrompt(e.target.value)}
-                    placeholder="Optional: custom instructions for the model…"
+                  placeholder="Optional: custom instructions…"
                     disabled={loading}
                     className="app-textarea app-textarea-secondary"
                     aria-label="Custom prompt"
