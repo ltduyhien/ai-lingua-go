@@ -14,6 +14,7 @@ type TranslateRequest struct {
 	Text       string `json:"text"`
 	SourceLang string `json:"source_lang"`
 	TargetLang string `json:"target_lang"`
+	CustomPrompt string `json:"custom_prompt"`
 }
 
 type TranslateResponse struct {
@@ -48,9 +49,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	protoReq := &translationv1.TranslateRequest{
-		Text:       req.Text,
-		SourceLang: req.SourceLang,
-		TargetLang: req.TargetLang,
+		Text:         req.Text,
+		SourceLang:   req.SourceLang,
+		TargetLang:   req.TargetLang,
+		CustomPrompt: req.CustomPrompt,
 	}
 	resp, err := h.grpc.Translate(r.Context(), protoReq)
 	if err != nil {

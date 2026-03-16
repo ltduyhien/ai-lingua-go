@@ -490,6 +490,21 @@ body {
   flex: 1;
   min-height: 0;
 }
+.app-textarea-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+.app-textarea-main {
+  flex: 2;
+  min-height: 0;
+}
+.app-textarea-secondary {
+  flex: 1;
+  min-height: 0;
+}
 .app-textarea-fill {
   flex: 1;
   min-height: 6rem;
@@ -585,6 +600,9 @@ body {
   resize: vertical;
   font-family: inherit;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.app-textarea-small {
+  min-height: 3rem;
 }
 .app-textarea::placeholder {
   color: hsl(var(--muted-foreground));

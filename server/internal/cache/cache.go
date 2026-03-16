@@ -24,8 +24,8 @@ func New(ctx context.Context, addr string, ttlSeconds int) (*Cache, error) {
 	return &Cache{client: client, ttl: ttl}, nil
 }
 
-func (c *Cache) Key(text, sourceLang, targetLang string) string {
-	return fmt.Sprintf("trans:%s:%s:%s", sourceLang, targetLang, text)
+func (c *Cache) Key(text, sourceLang, targetLang, customPrompt string) string {
+	return fmt.Sprintf("trans:%s:%s:%s:%s", sourceLang, targetLang, customPrompt, text)
 }
 
 func (c *Cache) Get(ctx context.Context, key string) (string, bool, error) {

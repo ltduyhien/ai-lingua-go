@@ -10,11 +10,11 @@ import (
 )
 
 type Translator interface {
-	Translate(ctx context.Context, text, sourceLang, targetLang string) (string, error)
+	Translate(ctx context.Context, text, sourceLang, targetLang, customPrompt string) (string, error)
 }
 
 type Cache interface {
-	Key(text, sourceLang, targetLang string) string
+	Key(text, sourceLang, targetLang, customPrompt string) string
 	Get(ctx context.Context, key string) (string, bool, error)
 	Set(ctx context.Context, key, value string) error
 }
@@ -37,20 +37,20 @@ func (s *Server) Translate(ctx context.Context, req *translationv1.TranslateRequ
 		return nil, status.Error(codes.InvalidArgument, "source_lang and target_lang are required")
 	}
 	if s.cache != nil {
-		key := s.cache.Key(req.GetText(), req.GetSourceLang(), req.GetTargetLang())
+		key := s.cache.Key(req.GetText(), req.GetSourceLang(), req.GetTargetLang(), req.GetCustomPrompt())
 		cached, ok, err := s.cache.Get(ctx, key)
 		if err != nil {
 		} else if ok {
 			return &translationv1.TranslateResponse{TranslatedText: cached}, nil
 		}
-		translated, err := s.translator.Translate(ctx, req.GetText(), req.GetSourceLang(), req.GetTargetLang())
+		translated, err := s.translator.Translate(ctx, req.GetText(), req.GetSourceLang(), req.GetTargetLang(), req.GetCustomPrompt())
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "translation failed: %v", err)
 		}
 		_ = s.cache.Set(ctx, key, translated)
 		return &translationv1.TranslateResponse{TranslatedText: translated}, nil
 	}
-	translated, err := s.translator.Translate(ctx, req.GetText(), req.GetSourceLang(), req.GetTargetLang())
+	translated, err := s.translator.Translate(ctx, req.GetText(), req.GetSourceLang(), req.GetTargetLang(), req.GetCustomPrompt())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "translation failed: %v", err)
 	}

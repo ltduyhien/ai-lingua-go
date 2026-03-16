@@ -37,7 +37,8 @@ type Message = {
 async function translate(
   text: string,
   sourceLang: string,
-  targetLang: string
+  targetLang: string,
+  customPrompt: string
 ): Promise<{ translated_text: string }> {
   const res = await fetch(`${API_BASE}/api/translate`, {
     method: 'POST',
@@ -46,6 +47,7 @@ async function translate(
       text,
       source_lang: sourceLang,
       target_lang: targetLang,
+      custom_prompt: customPrompt,
     }),
   })
   const data = await res.json()
@@ -56,6 +58,7 @@ async function translate(
 function App() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const [customPrompt, setCustomPrompt] = useState('')
   const [sourceLang, setSourceLang] = useState('en')
   const [targetLang, setTargetLang] = useState('es')
   const [loading, setLoading] = useState(false)
@@ -65,9 +68,15 @@ function App() {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
-  const runTranslation = (trimmed: string, src: string, tgt: string, assistantId: string) => {
+  const runTranslation = (
+    trimmed: string,
+    src: string,
+    tgt: string,
+    assistantId: string,
+    prompt: string
+  ) => {
     setLoading(true)
-    translate(trimmed, src, tgt)
+    translate(trimmed, src, tgt, prompt)
       .then(({ translated_text }) => {
         setMessages((m) =>
           m.map((msg) =>
@@ -105,12 +114,12 @@ function App() {
       ...m,
       { ...userMsg, id: assistantId, role: 'assistant', text: trimmed },
     ])
-    runTranslation(trimmed, sourceLang, targetLang, assistantId)
+    runTranslation(trimmed, sourceLang, targetLang, assistantId, customPrompt)
   }
 
   const handleRetry = (msg: Message) => {
     if (loading || !msg.error) return
-    runTranslation(msg.text, msg.sourceLang, msg.targetLang, msg.id)
+    runTranslation(msg.text, msg.sourceLang, msg.targetLang, msg.id, customPrompt)
     setMessages((m) =>
       m.map((m) => (m.id === msg.id ? { ...m, error: undefined, translatedText: undefined } : m))
     )
@@ -177,16 +186,26 @@ function App() {
                     </SelectContent>
                   </Select>
                 </div>
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type or paste text to translate…"
-                  disabled={loading}
-                  className="app-textarea app-textarea-fill"
-                  aria-label="Text to translate"
-                  aria-busy={loading}
-                  rows={5}
-                />
+                <div className="app-textarea-stack">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type or paste text to translate…"
+                    disabled={loading}
+                    className="app-textarea app-textarea-main"
+                    aria-label="Text to translate"
+                    aria-busy={loading}
+                  />
+                  <textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    placeholder="Optional: custom instructions for the model…"
+                    disabled={loading}
+                    className="app-textarea app-textarea-secondary"
+                    aria-label="Custom prompt"
+                    aria-busy={loading}
+                  />
+                </div>
                 <Button
                   type="submit"
                   disabled={loading}

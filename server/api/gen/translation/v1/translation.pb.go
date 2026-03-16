@@ -34,7 +34,9 @@ type TranslateRequest struct {
 	// Source language code (e.g. "en", "es").
 	SourceLang string `protobuf:"bytes,2,opt,name=source_lang,json=sourceLang,proto3" json:"source_lang,omitempty"`
 	// Target language code.
-	TargetLang    string `protobuf:"bytes,3,opt,name=target_lang,json=targetLang,proto3" json:"target_lang,omitempty"`
+	TargetLang string `protobuf:"bytes,3,opt,name=target_lang,json=targetLang,proto3" json:"target_lang,omitempty"`
+	// Optional additional instructions that are appended to the base translation prompt.
+	CustomPrompt string `protobuf:"bytes,4,opt,name=custom_prompt,json=customPrompt,proto3" json:"custom_prompt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -86,6 +88,13 @@ func (x *TranslateRequest) GetSourceLang() string {
 func (x *TranslateRequest) GetTargetLang() string {
 	if x != nil {
 		return x.TargetLang
+	}
+	return ""
+}
+
+func (x *TranslateRequest) GetCustomPrompt() string {
+	if x != nil {
+		return x.CustomPrompt
 	}
 	return ""
 }

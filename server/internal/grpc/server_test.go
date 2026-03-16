@@ -16,7 +16,7 @@ type fakeTranslator struct {
 	called bool
 }
 
-func (f *fakeTranslator) Translate(ctx context.Context, text, sourceLang, targetLang string) (string, error) {
+func (f *fakeTranslator) Translate(ctx context.Context, text, sourceLang, targetLang, customPrompt string) (string, error) {
 	f.called = true
 	if f.err != nil {
 		return "", f.err
@@ -33,8 +33,8 @@ type fakeCache struct {
 	setValue  string
 }
 
-func (f *fakeCache) Key(text, sourceLang, targetLang string) string {
-	return "trans:" + sourceLang + ":" + targetLang + ":" + text
+func (f *fakeCache) Key(text, sourceLang, targetLang, customPrompt string) string {
+	return "trans:" + sourceLang + ":" + targetLang + ":" + customPrompt + ":" + text
 }
 
 func (f *fakeCache) Get(ctx context.Context, key string) (string, bool, error) {
