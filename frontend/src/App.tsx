@@ -10,7 +10,7 @@ import {
 import { AlertCircle, ArrowRight, Loader2, RefreshCw } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081'
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 const LANGUAGES = [
   { code: 'en', name: 'English' },

@@ -41,7 +41,7 @@ func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang
 
 func buildTranslatePrompt(text, sourceLang, targetLang, customPrompt string) string {
 	base := "Translate the following text from " + sourceLang + " to " + targetLang + ".\n" +
-		"Rules: Output ONLY the translation in the target language. Translate every word—do not leave any source-language words untranslated (use the target language equivalent even for technical or rare terms). Do not include the original text, any part of it, or any explanation. Do not mix source and target language in the output. Preserve the same paragraph structure and line breaks as the source: use newlines in the same places so that lists, verses, or multi-paragraph text keep their layout.\n\n"
+		"Rules: Output ONLY the translation in the target language. Translate every word—do not leave any source-language words untranslated (use the target language equivalent even for technical or rare terms). Do not include the original text, any part of it, or any explanation. Do not mix source and target language in the output. Preserve the same paragraph structure and line breaks as the source: use newlines in the same places so that lists, verses, or multi-paragraph text keep their layout. If the translated paragraph structure is broken, or is not properly structured, fix it with a proper restructuring of the paragraphs. \n\n"
 
 	if customPrompt != "" {
 		base += "\n\nAdditional instructions:\n" + customPrompt

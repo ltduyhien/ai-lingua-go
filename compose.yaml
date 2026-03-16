@@ -56,7 +56,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: "${VITE_API_URL:-http://localhost:8081}"
+        VITE_API_URL: "${VITE_API_URL:-}"
     ports:
       - "3002:80"
     depends_on:

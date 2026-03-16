@@ -4,14 +4,14 @@ services:
       context: ./frontend
       target: dev
       args:
-        VITE_API_URL: "${VITE_API_URL:-http://localhost:8081}"
+        VITE_API_URL: "${VITE_API_URL:-}"
     ports:
       - "3002:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      VITE_API_URL: "${VITE_API_URL:-http://localhost:8081}"
+      VITE_API_URL: "${VITE_API_URL:-}"
     command: npm run dev -- --host 0.0.0.0
     profiles:
       - dev
