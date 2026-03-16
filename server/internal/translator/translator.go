@@ -30,8 +30,8 @@ func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang
 	}
 	prompt := buildTranslatePrompt(text, sourceLang, targetLang, customPrompt)
 	resp, err := llms.GenerateFromSinglePrompt(ctx, t.llm, prompt,
-		llms.WithMaxTokens(1024),
-		llms.WithTemperature(0.2),
+		llms.WithMaxTokens(2048),
+		llms.WithTemperature(0.1),
 	)
 	if err != nil {
 		return "", err
@@ -41,7 +41,12 @@ func (t *Translator) Translate(ctx context.Context, text, sourceLang, targetLang
 
 func buildTranslatePrompt(text, sourceLang, targetLang, customPrompt string) string {
 	base := "Translate the following text from " + sourceLang + " to " + targetLang + ".\n" +
-		"Rules: Output ONLY the translation in the target language. Translate every word—do not leave any source-language words untranslated (use the target language equivalent even for technical or rare terms). Do not include the original text, any part of it, or any explanation. Do not mix source and target language in the output. Preserve the same paragraph structure and line breaks as the source: use newlines in the same places so that lists, verses, or multi-paragraph text keep their layout. If the translated paragraph structure is broken, or is not properly structured, fix it with a proper restructuring of the paragraphs. \n\n"
+		"Rules:\n" +
+		"- Output ONLY the translation in the target language, nothing else.\n" +
+		"- Translate every word, phrase, and sentence; do not leave ANY character in the source language script (for example, no Chinese characters may remain in the output).\n" +
+		"- Do not add explanations, summaries, or duplicate rephrasings; translate the text exactly once.\n" +
+		"- Preserve the same paragraph and line-break structure as the source.\n\n" +
+		"- If the translated paragraph structure is broken, or is not properly structured, fix it with a proper restructuring of the paragraphs."
 
 	if customPrompt != "" {
 		base += "\n\nAdditional instructions:\n" + customPrompt
