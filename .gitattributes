@@ -1,0 +1,7 @@
+*.go linguist-language=Go
+
+frontend/* linguist-vendored
+frontend/** linguist-vendored
+
+frontend/node_modules/** linguist-vendored
+frontend/dist/** linguist-vendored
